@@ -28,10 +28,43 @@ backend-api/src/main/java/com/trafficfine/
 ## Running
 
 ```bash
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
 API base URL: `http://localhost:8080/api`
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+H2 console: `http://localhost:8080/h2-console`
+
+## Seed Data
+
+Admin login:
+
+```json
+{
+  "username": "admin",
+  "password": "password"
+}
+```
+
+Sample fines:
+
+| Reference | Category | Status |
+|---|---|---|
+| `TF123456` | `SPEEDING` | `UNPAID` |
+| `TF654321` | `SIGNAL` | `PAID` |
+| `TF777888` | `PARKING` | `CANCELLED` |
+
+## Key Endpoints
+
+```http
+POST /api/auth/login
+GET /api/fines/lookup?referenceNumber=TF123456&categoryCode=SPEEDING
+POST /api/payments
+GET /api/admin/dashboard
+GET /api/admin/fines?district=Matara&status=UNPAID
+```
+
+Use `Authorization: Bearer <token>` for `/api/admin/**`.
 
 ## Environment Variables
 
