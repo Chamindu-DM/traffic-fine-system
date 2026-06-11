@@ -8,7 +8,6 @@ import com.trafficfine.entity.PaymentStatus;
 import com.trafficfine.entity.TrafficFine;
 import com.trafficfine.integration.MockPaymentGateway;
 import com.trafficfine.integration.MockPaymentGateway.PaymentGatewayResult;
-import com.trafficfine.integration.MockSmsService;
 import com.trafficfine.repository.PaymentRepository;
 import com.trafficfine.repository.TrafficFineRepository;
 import java.time.LocalDateTime;
@@ -22,15 +21,14 @@ public class PaymentService {
     private final TrafficFineRepository trafficFineRepository;
     private final PaymentRepository paymentRepository;
     private final MockPaymentGateway paymentGateway;
-    private final MockSmsService smsService;
+    private final SmsService smsService;
 
     public PaymentService(
             FineService fineService,
             TrafficFineRepository trafficFineRepository,
             PaymentRepository paymentRepository,
             MockPaymentGateway paymentGateway,
-            MockSmsService smsService
-    ) {
+            SmsService smsService) {
         this.fineService = fineService;
         this.trafficFineRepository = trafficFineRepository;
         this.paymentRepository = paymentRepository;
@@ -61,8 +59,7 @@ public class PaymentService {
                 fine.getAmount(),
                 request.paymentMethod().trim().toUpperCase(),
                 PaymentStatus.SUCCESS,
-                paidAt
-        ));
+                paidAt));
         fine.markPaid(paidAt);
         trafficFineRepository.save(fine);
         smsService.sendPaymentConfirmation(fine);
@@ -73,7 +70,6 @@ public class PaymentService {
                 payment.getAmount(),
                 payment.getStatus().name(),
                 payment.getPaidAt(),
-                "Payment successful. SMS notification sent to the traffic police officer."
-        );
+                "Payment successful. SMS notification processed for the traffic police officer.");
     }
 }
