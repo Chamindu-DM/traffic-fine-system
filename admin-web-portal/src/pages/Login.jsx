@@ -8,13 +8,17 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
-    const success = login(username, password);
-    if (!success) {
-      setError('Invalid admin credentials. Please try again.');
+    try {
+      const success = await login(username, password);
+      if (!success) {
+        setError('Invalid admin credentials. Please try again.');
+      }
+    } catch (err) {
+      setError('Connection error. Please check if backend is running.');
     }
   };
 
