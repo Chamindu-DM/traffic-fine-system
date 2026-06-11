@@ -4,6 +4,7 @@ import com.trafficfine.dto.FineLookupResponse;
 import com.trafficfine.entity.TrafficFine;
 import com.trafficfine.repository.TrafficFineRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FineService {
@@ -16,6 +17,7 @@ public class FineService {
         this.fineMapper = fineMapper;
     }
 
+    @Transactional(readOnly = true)
     public FineLookupResponse lookup(String referenceNumber, String categoryCode) {
         return fineMapper.toLookupResponse(findFine(referenceNumber, categoryCode));
     }
