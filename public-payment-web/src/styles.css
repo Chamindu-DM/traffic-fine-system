@@ -1,0 +1,310 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #132238;
+  background:
+    radial-gradient(circle at top left, rgba(251, 184, 82, 0.32), transparent 32%),
+    radial-gradient(circle at top right, rgba(29, 78, 216, 0.18), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.hero-panel,
+.panel {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(19, 34, 56, 0.08);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.hero-panel {
+  border-radius: 28px;
+  padding: 32px;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 0.8fr);
+  align-items: end;
+}
+
+.hero-copy h1,
+.panel h2 {
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.hero-copy h1 {
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  line-height: 0.96;
+  max-width: 10ch;
+}
+
+.hero-copy p {
+  margin: 18px 0 0;
+  max-width: 62ch;
+  color: #4a5b72;
+  font-size: 1.02rem;
+}
+
+.eyebrow,
+.panel-kicker {
+  display: inline-flex;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #a16207;
+}
+
+.hero-badges {
+  display: grid;
+  gap: 12px;
+}
+
+.badge,
+.pill,
+.success-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.badge {
+  background: #132238;
+  color: #fff;
+}
+
+.card-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.panel {
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.panel-header h2 {
+  margin-top: 4px;
+  font-size: 1.5rem;
+}
+
+.form-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span,
+dt {
+  font-size: 0.9rem;
+  color: #4a5b72;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid rgba(19, 34, 56, 0.16);
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: #fff;
+  color: #132238;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.primary-button,
+.ghost-button {
+  border: 0;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #0f172a, #2563eb);
+  color: #fff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.24);
+}
+
+.secondary-button {
+  margin-top: 8px;
+}
+
+.ghost-button {
+  background: rgba(19, 34, 56, 0.06);
+  color: #132238;
+}
+
+.primary-button:hover,
+.ghost-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled {
+  cursor: progress;
+  opacity: 0.72;
+  transform: none;
+}
+
+.alert {
+  margin-top: 16px;
+  border-radius: 18px;
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.error-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.info-alert {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.fine-summary,
+.confirmation-card {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(19, 34, 56, 0.08);
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.pill {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.muted,
+.confirmation-message,
+dd {
+  color: #4a5b72;
+}
+
+.details-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.compact-grid {
+  margin-top: 18px;
+}
+
+.details-grid div {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(241, 245, 249, 0.8);
+}
+
+dt {
+  margin: 0 0 4px;
+}
+
+dd {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #132238;
+}
+
+.confirmation-panel .success-mark {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.confirmation-message {
+  margin: 16px 0 0;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 860px) {
+  .hero-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: min(100% - 20px, 1120px);
+    padding-top: 16px;
+  }
+
+  .hero-panel,
+  .panel {
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  .hero-copy h1 {
+    max-width: none;
+  }
+}

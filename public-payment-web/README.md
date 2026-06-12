@@ -5,17 +5,15 @@ React single-page application that allows drivers to look up and pay traffic fin
 ## Tech Stack
 
 - React 18 + Vite
-- React Router
 - Axios (API calls)
-- CSS Modules / Vanilla CSS
+- Plain CSS
 
 ## Features
 
-- Search fine by reference number and category code
-- Display fine amount, district, officer, and status
-- Payment form (mock card payment)
-- Duplicate payment prevention
-- Payment confirmation / failure screen
+- Fine lookup by reference number and category code
+- Conditional payment form for unpaid fines only
+- Payment confirmation screen with payment reference
+- Loading and error states for API calls
 
 ## Running
 
@@ -26,8 +24,10 @@ npm run dev
 
 Runs on `http://localhost:5173`.
 
-Set the backend URL in `.env`:
+The Vite dev server proxies `/api` to `http://localhost:8080`, so the portal can call the Spring Boot backend without extra CORS setup during local development.
+
+If you want to override the API base URL, set it in `.env`:
 
 ```
-VITE_API_BASE_URL=http://localhost:8080/api
+VITE_API_BASE_URL=/api
 ```
