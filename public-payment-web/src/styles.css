@@ -308,3 +308,39 @@ dd {
     max-width: none;
   }
 }
+
+.payment-review-card {
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(19, 34, 56, 0.06);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 8px;
+}
+
+.payment-review-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 18px 0;
+  padding: 16px;
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  border-radius: 16px;
+}
+
+.payment-review-amount .label {
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.payment-review-amount .value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.payment-review-note {
+  font-size: 0.92rem;
+  color: #4a5b72;
+  margin: 0;
+}

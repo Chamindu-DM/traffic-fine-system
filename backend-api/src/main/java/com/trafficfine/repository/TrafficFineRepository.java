@@ -20,6 +20,11 @@ public interface TrafficFineRepository extends JpaRepository<TrafficFine, Long>,
     @EntityGraph(attributePaths = {"category", "officer"})
     List<TrafficFine> findAll(Specification<TrafficFine> spec, Sort sort);
 
+    boolean existsByReferenceNumber(String referenceNumber);
+
+    @EntityGraph(attributePaths = {"category", "officer"})
+    Optional<TrafficFine> findByReferenceNumber(String referenceNumber);
+
     long countByStatus(FineStatus status);
 
     @Query("select coalesce(sum(f.amount), 0) from TrafficFine f where f.status = com.trafficfine.entity.FineStatus.PAID")

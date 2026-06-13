@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import axios from 'axios';
-import { lookupFine, submitPayment } from './api';
+import { lookupFine, initiatePayment } from './api';
 import type { FineLookupResponse, PaymentResponse } from './types';
+
+declare const payhere: any;
 
 type ViewState = 'lookup' | 'payment' | 'confirmation';
 
@@ -16,10 +18,7 @@ const initialLookupForm = {
   categoryCode: '',
 };
 
-const initialPaymentForm = {
-  paymentMethod: 'CARD',
-  cardLastFourDigits: '',
-};
+// initialPaymentForm removed as card details are not entered manually anymore
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -56,7 +55,6 @@ function isAxiosMessage(error: unknown) {
 export default function App() {
   const [view, setView] = useState<ViewState>('lookup');
   const [lookupForm, setLookupForm] = useState(initialLookupForm);
-  const [paymentForm, setPaymentForm] = useState(initialPaymentForm);
   const [fine, setFine] = useState<FineLookupResponse | null>(null);
   const [paymentResult, setPaymentResult] = useState<PaymentResponse | null>(null);
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -89,7 +87,6 @@ export default function App() {
         lookupForm.categoryCode.trim(),
       );
       setFine(result);
-      setPaymentForm(initialPaymentForm);
       setView(result.status.toUpperCase() === 'UNPAID' ? 'payment' : 'lookup');
     } catch (error) {
       setFine(null);
@@ -114,21 +111,49 @@ export default function App() {
     setPaymentLoading(true);
 
     try {
-      const result = await submitPayment({
+      const paymentParams = await initiatePayment({
         referenceNumber: fine.referenceNumber,
         categoryCode: fine.categoryCode,
-        paymentMethod: paymentForm.paymentMethod.trim(),
-        cardLastFourDigits: paymentForm.cardLastFourDigits.trim(),
       });
 
-      setPaymentResult(result);
-      setView('confirmation');
+      payhere.onCompleted = function (orderId: string) {
+        setPaymentLoading(false);
+        setPaymentResult({
+          paymentReference: orderId,
+          referenceNumber: fine.referenceNumber,
+          amount: fine.amount,
+          status: 'PAID',
+          paidAt: new Date().toISOString(),
+          message: 'Payment completed successfully. Your fine status will update shortly.',
+        });
+        setView('confirmation');
+      };
+
+      payhere.onDismissed = function () {
+        setPaymentLoading(false);
+        setPaymentError({
+          title: 'Payment cancelled',
+          details: 'You closed the PayHere payment window.',
+        });
+      };
+
+      payhere.onError = function (error: any) {
+        setPaymentLoading(false);
+        setPaymentError({
+          title: 'Payment error',
+          details: typeof error === 'string' ? error : JSON.stringify(error),
+        });
+      };
+
+      if (paymentParams.sandbox) {
+        payhere.sandbox = true;
+      }
+      payhere.startPayment(paymentParams);
     } catch (error) {
       setPaymentError({
-        title: 'Payment could not be completed',
+        title: 'Payment initiation failed',
         details: isAxiosMessage(error),
       });
-    } finally {
       setPaymentLoading(false);
     }
   }
@@ -139,7 +164,6 @@ export default function App() {
     setPaymentResult(null);
     setLookupError(null);
     setPaymentError(null);
-    setPaymentForm(initialPaymentForm);
     setLookupForm(initialLookupForm);
   }
 
@@ -277,49 +301,24 @@ export default function App() {
             <header className="panel-header">
               <div>
                 <p className="panel-kicker">Step 2</p>
-                <h2>Payment Form</h2>
+                <h2>Payment Review</h2>
               </div>
             </header>
 
             <form className="form-stack" onSubmit={handlePaymentSubmit}>
-              <label className="field">
-                <span>Payment method</span>
-                <select
-                  value={paymentForm.paymentMethod}
-                  onChange={(event) =>
-                    setPaymentForm((current) => ({
-                      ...current,
-                      paymentMethod: event.target.value,
-                    }))
-                  }
-                  required
-                >
-                  <option value="CARD">Card</option>
-                  <option value="MOBILE_BANKING">Mobile Banking</option>
-                  <option value="QR">QR Payment</option>
-                </select>
-              </label>
-
-              <label className="field">
-                <span>Card last four digits</span>
-                <input
-                  value={paymentForm.cardLastFourDigits}
-                  onChange={(event) =>
-                    setPaymentForm((current) => ({
-                      ...current,
-                      cardLastFourDigits: event.target.value.replace(/\D/g, '').slice(0, 4),
-                    }))
-                  }
-                  inputMode="numeric"
-                  placeholder="1234"
-                  minLength={4}
-                  maxLength={4}
-                  required
-                />
-              </label>
+              <div className="payment-review-card">
+                <p>You are about to pay for fine <strong>{fine.referenceNumber}</strong>.</p>
+                <div className="payment-review-amount">
+                  <span className="label">Total Amount</span>
+                  <span className="value">{formatCurrency(fine.amount)}</span>
+                </div>
+                <p className="payment-review-note">
+                  Click the button below to complete your payment securely via the PayHere Payment Gateway.
+                </p>
+              </div>
 
               <button type="submit" className="primary-button" disabled={paymentLoading}>
-                {paymentLoading ? 'Processing payment...' : 'Pay Fine'}
+                {paymentLoading ? 'Redirecting to PayHere...' : 'Pay Now'}
               </button>
             </form>
 
@@ -347,7 +346,7 @@ export default function App() {
 
               <dl className="details-grid compact-grid">
                 <div>
-                  <dt>Payment reference</dt>
+                  <dt>PayHere Order ID</dt>
                   <dd>{paymentResult.paymentReference}</dd>
                 </div>
                 <div>

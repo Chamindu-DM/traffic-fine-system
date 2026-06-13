@@ -3,6 +3,7 @@ package com.trafficfine.security;
 import com.trafficfine.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,11 +30,13 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/fines/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/fine-categories").permitAll()
                         .requestMatchers(
                                 "/api/auth/login",
-                                "/api/fines/lookup",
                                 "/api/payments",
-                                "/api/fines/**",
+                                "/api/payments/initiate",
+                                "/api/payments/notify",
                                 "/h2-console/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",

@@ -30,3 +30,26 @@ export interface AdminFineResponse {
   issuedAt: string;
   paidAt: string | null;
 }
+
+export interface FineCategory {
+  id: number;
+  code: string;
+  name: string;
+  description: string;
+  amount: number;
+}
+
+export interface CreateFineRequest {
+  driverLicenseNumber: string;
+  vehicleNumber: string;
+  district: string;
+  categoryId: number;
+  officerId: number;
+}
+
+export interface CreateFineResponse {
+  referenceNumber: string;
+  amount: number;
+  category: string;
+  status: string;
+}

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import type { LoginResponse } from '../types';
+import { Shield } from 'lucide-react';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -40,24 +41,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 font-sans">
-      {/* Background blobs for premium glassmorphism aesthetic */}
-      <div className="absolute top-1/4 left-1/4 h-72 w-72 rounded-full bg-blue-500/10 blur-[100px] animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-purple-500/10 blur-[100px] animate-pulse delay-1000"></div>
-
-      <div className="relative w-full max-w-md px-6">
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-8 shadow-2xl backdrop-blur-xl">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white">
+    <div className="flex min-h-screen items-center justify-center px-4 font-sans">
+      <div className="w-full max-w-md">
+        {/* Glassmorphism login card matching the public payment design */}
+        <div className="rounded-3xl border border-slate-200/60 bg-white/82 p-8 shadow-2xl backdrop-blur-md">
+          <div className="mb-8 text-center flex flex-col items-center">
+            <div className="mb-3 rounded-full bg-amber-500/10 p-3 text-amber-700">
+              <Shield className="h-8 w-8" />
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
               Traffic Fine Admin
             </h1>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-slate-600">
               Authorized personnel login portal
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
+            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               {error}
             </div>
           )}
@@ -66,7 +67,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="username"
-                className="block text-sm font-semibold text-slate-300"
+                className="block text-sm font-bold text-slate-700"
               >
                 Username
               </label>
@@ -76,7 +77,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3 text-white placeholder-slate-500 outline-none transition duration-200 focus:border-blue-500 focus:bg-slate-800/80 focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-slate-900 placeholder-slate-400 outline-none transition duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/12"
                 placeholder="Enter username"
                 required
               />
@@ -85,7 +86,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-slate-300"
+                className="block text-sm font-bold text-slate-700"
               >
                 Password
               </label>
@@ -95,7 +96,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3 text-white placeholder-slate-500 outline-none transition duration-200 focus:border-blue-500 focus:bg-slate-800/80 focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-slate-900 placeholder-slate-400 outline-none transition duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/12"
                 placeholder="Enter password"
                 required
               />
@@ -104,7 +105,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50"
+              className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-slate-900 to-blue-700 py-3.5 text-sm font-bold text-white transition duration-200 hover:-translate-y-px hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50"
             >
               {loading ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
