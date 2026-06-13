@@ -5,12 +5,25 @@ import com.trafficfine.entity.TrafficFine;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TrafficFineRepository extends JpaRepository<TrafficFine, Long>, JpaSpecificationExecutor<TrafficFine> {
+    @EntityGraph(attributePaths = {"category", "officer"})
     Optional<TrafficFine> findByReferenceNumberAndCategoryCodeIgnoreCase(String referenceNumber, String categoryCode);
+
+    @Override
+    @EntityGraph(attributePaths = {"category", "officer"})
+    List<TrafficFine> findAll(Specification<TrafficFine> spec, Sort sort);
+
+    boolean existsByReferenceNumber(String referenceNumber);
+
+    @EntityGraph(attributePaths = {"category", "officer"})
+    Optional<TrafficFine> findByReferenceNumber(String referenceNumber);
 
     long countByStatus(FineStatus status);
 

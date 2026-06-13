@@ -1,10 +1,15 @@
 package com.trafficfine.controller;
 
+import com.trafficfine.dto.CreateFineRequest;
+import com.trafficfine.dto.CreateFineResponse;
 import com.trafficfine.dto.FineLookupResponse;
 import com.trafficfine.service.FineService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,5 +31,10 @@ public class FineController {
             @RequestParam @NotBlank String categoryCode
     ) {
         return fineService.lookup(referenceNumber, categoryCode);
+    }
+
+    @PostMapping
+    public CreateFineResponse create(@Valid @RequestBody CreateFineRequest request) {
+        return fineService.create(request);
     }
 }
