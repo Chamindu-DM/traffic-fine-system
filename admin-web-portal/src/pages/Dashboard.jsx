@@ -9,6 +9,8 @@ const Dashboard = () => {
   const { token } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [districtFilter, setDistrictFilter] = useState('ALL');
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [dashboardData, setDashboardData] = useState({
     totalCollected: 0,
     paidFineCount: 0,
@@ -36,7 +38,11 @@ const Dashboard = () => {
   const fetchFines = async () => {
     try {
       setLoading(true);
-      const url = statusFilter === 'ALL' ? '/api/admin/fines' : `/api/admin/fines?status=${statusFilter}`;
+      const params = new URLSearchParams();
+      if (statusFilter !== 'ALL') params.append('status', statusFilter);
+      if (districtFilter !== 'ALL') params.append('district', districtFilter);
+      if (categoryFilter !== 'ALL') params.append('categoryCode', categoryFilter);
+      const url = `/api/admin/fines?${params.toString()}`;
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -56,7 +62,7 @@ const Dashboard = () => {
       fetchDashboardData();
       fetchFines();
     }
-  }, [token, statusFilter]);
+  }, [token, statusFilter, districtFilter, categoryFilter]);
 
   const filteredRecords = (fines || []).filter(record => 
     record.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase())
@@ -146,6 +152,32 @@ const Dashboard = () => {
               <option value="PAID">Paid</option>
               <option value="UNPAID">Unpaid</option>
               <option value="CANCELLED">Cancelled</option>
+            </select>
+            <select 
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              value={districtFilter}
+              onChange={(e) => setDistrictFilter(e.target.value)}
+            >
+              <option value="ALL">All Districts</option>
+              <option value="Colombo">Colombo</option>
+              <option value="Matara">Matara</option>
+              <option value="Kandy">Kandy</option>
+              <option value="Galle">Galle</option>
+              <option value="Jaffna">Jaffna</option>
+              <option value="Kurunegala">Kurunegala</option>
+            </select>
+            <select 
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="ALL">All Categories</option>
+              <option value="SPEEDING">SPEEDING</option>
+              <option value="SIGNAL">SIGNAL</option>
+              <option value="PARKING">PARKING</option>
+              <option value="DRUNK_DRIVING">DRUNK_DRIVING</option>
+              <option value="NO_HELMET">NO_HELMET</option>
+              <option value="OVERLOADING">OVERLOADING</option>
             </select>
           </div>
         </div>
