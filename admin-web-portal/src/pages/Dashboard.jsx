@@ -201,7 +201,7 @@ const Dashboard = () => {
                 {filteredRecords.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900">{record.referenceNumber}</td>
-                    <td className="px-6 py-4 text-gray-600">{record.categoryName}</td>
+                    <td className="px-6 py-4 text-gray-600">{record.category}</td>
                     <td className="px-6 py-4 text-gray-600">{record.district}</td>
                     <td className="px-6 py-4 text-gray-900 font-semibold">LKR {record.amount.toLocaleString()}</td>
                     <td className="px-6 py-4">
