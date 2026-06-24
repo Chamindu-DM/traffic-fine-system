@@ -49,22 +49,34 @@ const PaymentPortal = () => {
     setError('');
     setLoading(true);
     try {
+      const cleanCardNumber = paymentInfo.creditCardNumber.replace(/\D/g, '');
+      if (cleanCardNumber.length < 4) {
+        setError('Please enter a valid credit card number with at least 4 digits.');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('/api/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           referenceNumber: refNumber,
           categoryCode: category,
-          cardHolderName: paymentInfo.cardHolderName,
-          creditCardNumber: paymentInfo.creditCardNumber
+          paymentMethod: 'CARD',
+          cardLastFourDigits: cleanCardNumber.slice(-4)
         })
       });
 
       if (response.ok) {
         setStep(3);
       } else {
-        const err = await response.json();
-        setError(err.message || 'Payment failed. Please try again.');
+        const text = await response.text();
+        try {
+          const err = JSON.parse(text);
+          setError(err.message || 'Payment failed. Please try again.');
+        } catch {
+          setError('Payment failed. Please try again.');
+        }
       }
     } catch (err) {
       setError('Connection error. Please try again later.');
