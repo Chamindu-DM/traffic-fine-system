@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import axios from 'axios';
 import { lookupFine, initiatePayment } from './api';
@@ -61,6 +61,27 @@ export default function App() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [lookupError, setLookupError] = useState<FormError | null>(null);
   const [paymentError, setPaymentError] = useState<FormError | null>(null);
+  const [categories, setCategories] = useState<{ code: string; name: string }[]>([]);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await axios.get('/api/fine-categories');
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Failed to load fine categories, using fallbacks', error);
+        setCategories([
+          { code: 'SPEEDING', name: 'Speeding' },
+          { code: 'SIGNAL', name: 'Traffic Signal Violation' },
+          { code: 'PARKING', name: 'Illegal Parking' },
+          { code: 'DRUNK_DRIVING', name: 'Drunk Driving' },
+          { code: 'NO_HELMET', name: 'No Helmet' },
+          { code: 'OVERLOADING', name: 'Overloading' },
+        ]);
+      }
+    }
+    loadCategories();
+  }, []);
 
   const isPaid = fine?.status?.toUpperCase() === 'PAID';
   const isUnpaid = fine?.status?.toUpperCase() === 'UNPAID';
@@ -218,8 +239,8 @@ export default function App() {
             </label>
 
             <label className="field">
-              <span>Category code</span>
-              <input
+              <span>Fine Category</span>
+              <select
                 value={lookupForm.categoryCode}
                 onChange={(event) =>
                   setLookupForm((current) => ({
@@ -227,10 +248,15 @@ export default function App() {
                     categoryCode: event.target.value,
                   }))
                 }
-                placeholder="SPD"
-                autoComplete="off"
                 required
-              />
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category.code} value={category.code}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <button type="submit" className="primary-button" disabled={lookupLoading}>

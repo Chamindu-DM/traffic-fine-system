@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 const COLORS = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981'];
 
 const Dashboard = () => {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [districtFilter, setDistrictFilter] = useState('ALL');
@@ -26,6 +26,10 @@ const Dashboard = () => {
       const response = await fetch('/api/admin/dashboard', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (response.status === 401 || response.status === 403) {
+        logout();
+        return;
+      }
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data);
@@ -46,6 +50,10 @@ const Dashboard = () => {
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (response.status === 401 || response.status === 403) {
+        logout();
+        return;
+      }
       if (response.ok) {
         const data = await response.json();
         setFines(data);

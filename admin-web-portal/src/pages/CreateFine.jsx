@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, CheckCircle, AlertCircle, FilePlus } from 'lucide-react';
 
 const CreateFine = () => {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [categories, setCategories] = useState([]);
   const [officers, setOfficers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,6 +33,11 @@ const CreateFine = () => {
             headers: { 'Authorization': `Bearer ${token}` }
           })
         ]);
+
+        if (catRes.status === 401 || catRes.status === 403 || offRes.status === 401 || offRes.status === 403) {
+          logout();
+          return;
+        }
 
         if (catRes.ok && offRes.ok) {
           const cats = await catRes.json();
@@ -75,6 +80,11 @@ const CreateFine = () => {
           officerId: parseInt(formData.officerId, 10)
         })
       });
+
+      if (response.status === 401 || response.status === 403) {
+        logout();
+        return;
+      }
 
       if (response.ok) {
         const result = await response.json();
