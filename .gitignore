@@ -62,3 +62,4 @@ temp/
 # Local backend secrets
 backend-api/src/main/resources/application-local.properties
 *BACKEND_DOCUMENTATION.md
+*prompt.txt
