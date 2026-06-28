@@ -1,0 +1,8 @@
+com/trafficfine/reportingservice/ReportingServiceApplication.class
+com/trafficfine/reportingservice/repository/TrafficFineReportRepository.class
+com/trafficfine/reportingservice/listener/ReportingEventListener.class
+com/trafficfine/reportingservice/config/RabbitConfig.class
+com/trafficfine/reportingservice/controller/AdminController.class
+com/trafficfine/reportingservice/dto/AdminFineResponse.class
+com/trafficfine/reportingservice/service/AdminReportService.class
+com/trafficfine/reportingservice/entity/TrafficFineReport.class

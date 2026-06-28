@@ -1,5 +1,6 @@
 package com.trafficfine.common.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -11,6 +12,7 @@ public record FineLookupResponse(
         String district,
         String officerName,
         String officerBadgeNumber,
+        String officerPhoneNumber,
         String status,
         LocalDateTime issuedAt
-) {}
+) implements Serializable {}
