@@ -1,0 +1,61 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/payments_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+payhere:
+  merchant-id: ${PAYHERE_MERCHANT_ID:YOUR_MERCHANT_ID}
+  secret: ${PAYHERE_SECRET:YOUR_SECRET}
+  sandbox: ${PAYHERE_SANDBOX:true}
+  notify-url: ${PAYHERE_NOTIFY_URL:http://localhost:8080/api/payments/notify}
+  return-url: ${PAYHERE_RETURN_URL:http://localhost:5173/payment-success}
+  cancel-url: ${PAYHERE_CANCEL_URL:http://localhost:5173/payment-cancel}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      fineServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

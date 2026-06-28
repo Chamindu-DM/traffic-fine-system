@@ -18,6 +18,7 @@ const Dashboard = () => {
   });
   const [fines, setFines] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   const fetchDashboardData = async () => {
     try {
@@ -27,9 +28,12 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data);
+      } else {
+        setFetchError(`Dashboard request failed: HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      setFetchError(`Failed to load dashboard: ${error.message || String(error)}`);
     }
   };
 
@@ -43,9 +47,12 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setFines(data);
+      } else {
+        setFetchError(`Fines request failed: HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('Failed to fetch fines:', error);
+      setFetchError(`Failed to load fines: ${error.message || String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -68,6 +75,13 @@ const Dashboard = () => {
         <LayoutDashboard className="text-blue-600" size={32} /> 
         Traffic Fine Monitoring Dashboard
       </h1>
+
+      {fetchError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
+          <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
+          <span><strong>Error:</strong> {fetchError}</span>
+        </div>
+      )}
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -94,10 +108,10 @@ const Dashboard = () => {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dashboardData.districtWiseCollections || []}>
-                <XAxis dataKey="name" stroke="#9ca3af" />
+                <XAxis dataKey="label" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
                 <Tooltip formatter={(value) => `LKR ${value.toLocaleString()}`} />
-                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -110,12 +124,12 @@ const Dashboard = () => {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={dashboardData.categoryWiseCollections || []} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                <Pie data={dashboardData.categoryWiseCollections || []} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="amount" nameKey="label">
                   {(dashboardData.categoryWiseCollections || []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `LKR ${value.toLocaleString()}`} />
+                <Tooltip formatter={(value, name) => [`LKR ${value.toLocaleString()}`, name]} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -167,11 +181,11 @@ const Dashboard = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredRecords.map((record) => (
-                  <tr key={record.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={record.referenceNumber} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900">{record.referenceNumber}</td>
-                    <td className="px-6 py-4 text-gray-600">{record.categoryName}</td>
+                    <td className="px-6 py-4 text-gray-600">{record.category}</td>
                     <td className="px-6 py-4 text-gray-600">{record.district}</td>
-                    <td className="px-6 py-4 text-gray-900 font-semibold">LKR {record.amount.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-gray-900 font-semibold">LKR {record.amount?.toLocaleString()}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                         record.status === 'PAID' ? 'bg-green-100 text-green-700' : 
@@ -180,7 +194,7 @@ const Dashboard = () => {
                         {record.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{record.issuedAt.split('T')[0]}</td>
+                    <td className="px-6 py-4 text-gray-500">{record.issuedAt?.split('T')[0] || ''}</td>
                   </tr>
                 ))}
               </tbody>
