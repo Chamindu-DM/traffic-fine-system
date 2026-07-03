@@ -1,0 +1,3 @@
+/Users/senumidissanayake/traffic-fine-system/microservices/api-gateway/src/main/java/com/trafficfine/apigateway/ApiGatewayApplication.java
+/Users/senumidissanayake/traffic-fine-system/microservices/api-gateway/src/main/java/com/trafficfine/apigateway/controller/FallbackController.java
+/Users/senumidissanayake/traffic-fine-system/microservices/api-gateway/src/main/java/com/trafficfine/apigateway/filter/JwtAuthenticationFilter.java

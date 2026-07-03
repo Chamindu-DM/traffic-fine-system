@@ -64,6 +64,35 @@ Runs on `http://localhost:5174`.
 
 Open `android-app/` in Android Studio and run on an emulator or physical device.
 
+## Microservices Architecture (Phase 2)
+
+The system includes a fully refactored, event-driven microservices backend situated under the `microservices/` directory.
+
+### Port Mappings
+* `8761` - Eureka Service Registry
+* `8888` - Config Server (Spring Cloud Config)
+* `8080` - API Gateway (Reverse Proxy, JWT filter, Rate Limiting)
+* `8081` - Auth Service
+* `8082` - Fine Service (JPA, Redis cache, RabbitMQ publisher)
+* `8083` - Payment Service (OpenFeign, Redis idempotency check)
+* `8084` - Notification Service (RabbitMQ consumer, SMS fallback)
+* `8085` - Reporting Service (CQRS read database, dashboard caching)
+
+### Running the Microservices
+
+1. **Install dependencies locally:**
+   ```bash
+   cd microservices
+   mvn clean install -DskipTests
+   ```
+
+2. **Ensure MySQL, Redis, and RabbitMQ are running natively on your machine.**
+
+3. **Start the services in order (in separate terminal tabs):**
+   * Registry: `cd service-registry && mvn spring-boot:run`
+   * Config Server: `cd config-server && mvn spring-boot:run`
+   * Other Services (e.g. gateway, auth-service): `cd <service-folder> && mvn spring-boot:run`
+
 ## Default Admin Credentials (seed data)
 
 | Field | Value |

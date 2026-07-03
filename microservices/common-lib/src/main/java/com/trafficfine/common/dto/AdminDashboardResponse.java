@@ -1,5 +1,6 @@
 package com.trafficfine.common.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -10,4 +11,4 @@ public record AdminDashboardResponse(
         long cancelledFineCount,
         List<CollectionBreakdownResponse> districtWiseCollections,
         List<CollectionBreakdownResponse> categoryWiseCollections
-) {}
+) implements Serializable {}

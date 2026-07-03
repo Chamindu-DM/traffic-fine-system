@@ -30,7 +30,7 @@ public class DataSeeder {
     ) {
         return args -> {
             if (!userRepository.existsByUsername("admin")) {
-                userRepository.save(new User("Senior Police Admin", "admin", passwordEncoder.encode("password"), Role.ADMIN));
+                userRepository.save(new User("Senior Police Admin", "admin", passwordEncoder.encode("admin123"), Role.ADMIN));
             }
 
             FineCategory speeding = fineCategoryRepository.findByCodeIgnoreCase("SPEEDING")
