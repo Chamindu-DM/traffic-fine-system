@@ -1,9 +1,0 @@
-com/trafficfine/authservice/config/DataSeeder.class
-com/trafficfine/authservice/config/SecurityConfig.class
-com/trafficfine/authservice/AuthServiceApplication.class
-com/trafficfine/authservice/repository/UserRepository.class
-com/trafficfine/authservice/entity/Role.class
-com/trafficfine/authservice/service/AuthService.class
-com/trafficfine/authservice/entity/User.class
-com/trafficfine/authservice/service/JwtService.class
-com/trafficfine/authservice/controller/AuthController.class

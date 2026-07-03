@@ -1,9 +1,0 @@
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/AuthServiceApplication.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/config/DataSeeder.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/config/SecurityConfig.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/controller/AuthController.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/entity/Role.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/entity/User.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/repository/UserRepository.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/service/AuthService.java
-/Users/senumidissanayake/traffic-fine-system/microservices/auth-service/src/main/java/com/trafficfine/authservice/service/JwtService.java
