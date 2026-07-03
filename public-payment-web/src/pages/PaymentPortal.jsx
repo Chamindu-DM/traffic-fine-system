@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, CreditCard, CheckCircle, AlertCircle, MapPin } from 'lucide-react';
+import Logo from '../assets/Sri_Lanka_Police_logo.svg'
 
 const PaymentPortal = () => {
   const [step, setStep] = useState(1); // 1: Search, 2: Details/Pay, 3: Success
@@ -77,9 +78,10 @@ const PaymentPortal = () => {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center py-12 px-4 font-sans">
       <div className="max-w-md w-full">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 items-center justify-center flex flex-col gap-3">
+          <img src={Logo} alt="Police Logo" width={100} height={100} />
           <h1 className="text-2xl font-bold text-slate-800">Online Fine Payment</h1>
-          <p className="text-gray-500">Sri Lanka Police Department Digital Services[cite: 3]</p>
+          <p className="text-gray-500">Sri Lanka Police Department Digital Services</p>
         </div>
 
         {/* Error Message */}
