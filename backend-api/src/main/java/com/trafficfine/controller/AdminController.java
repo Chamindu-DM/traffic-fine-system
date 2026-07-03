@@ -2,7 +2,11 @@ package com.trafficfine.controller;
 
 import com.trafficfine.dto.AdminDashboardResponse;
 import com.trafficfine.dto.AdminFineResponse;
+import com.trafficfine.dto.FineCategoryDto;
+import com.trafficfine.dto.OfficerDto;
 import com.trafficfine.entity.FineStatus;
+import com.trafficfine.repository.FineCategoryRepository;
+import com.trafficfine.repository.OfficerRepository;
 import com.trafficfine.service.AdminReportService;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,9 +21,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
     private final AdminReportService adminReportService;
+    private final FineCategoryRepository fineCategoryRepository;
+    private final OfficerRepository officerRepository;
 
-    public AdminController(AdminReportService adminReportService) {
+    public AdminController(
+            AdminReportService adminReportService,
+            FineCategoryRepository fineCategoryRepository,
+            OfficerRepository officerRepository
+    ) {
         this.adminReportService = adminReportService;
+        this.fineCategoryRepository = fineCategoryRepository;
+        this.officerRepository = officerRepository;
     }
 
     @GetMapping("/dashboard")
@@ -36,5 +48,19 @@ public class AdminController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
     ) {
         return adminReportService.searchFines(district, categoryCode, status, fromDate, toDate);
+    }
+
+    @GetMapping("/categories")
+    public List<FineCategoryDto> categories() {
+        return fineCategoryRepository.findAll().stream()
+                .map(c -> new FineCategoryDto(c.getId(), c.getCode(), c.getName(), c.getAmount()))
+                .toList();
+    }
+
+    @GetMapping("/officers")
+    public List<OfficerDto> officers() {
+        return officerRepository.findAll().stream()
+                .map(o -> new OfficerDto(o.getId(), o.getName(), o.getBadgeNumber(), o.getDistrict()))
+                .toList();
     }
 }

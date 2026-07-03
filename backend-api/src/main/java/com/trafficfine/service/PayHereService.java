@@ -78,6 +78,8 @@ public class PayHereService {
         String currency = "LKR";
 
         String hash = generateHash(orderId, amount, currency);
+        System.out.println("DEBUG PAYHERE: order_id=" + orderId + ", amount=" + formattedAmount + ", currency="
+                + currency + ", hash=" + hash);
 
         Map<String, Object> request = new HashMap<>();
         request.put("sandbox", sandbox);
@@ -131,8 +133,7 @@ public class PayHereService {
                     amount,
                     method.toUpperCase(),
                     PaymentStatus.SUCCESS,
-                    paidAt
-            );
+                    paidAt);
             paymentRepository.save(payment);
 
             fine.markPaid(paidAt);
@@ -156,10 +157,41 @@ public class PayHereService {
         }
 
         String secretMd5 = md5Hex(secret).toUpperCase();
-        String raw = merchantIdParam + orderIdParam + payhereAmountParam + payhereCurrencyParam + statusCodeParam + secretMd5;
+        String raw = merchantIdParam + orderIdParam + payhereAmountParam + payhereCurrencyParam + statusCodeParam
+                + secretMd5;
         String calculatedSig = md5Hex(raw).toUpperCase();
 
         return calculatedSig.equalsIgnoreCase(md5sigParam);
+    }
+
+    @Transactional
+    public Map<String, String> simulateWebhookSuccess(String referenceNumber) {
+        TrafficFine fine = trafficFineRepository.findByReferenceNumber(referenceNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Fine not found: " + referenceNumber));
+
+        BigDecimal amount = fine.getAmount();
+        String formattedAmount = String.format(Locale.US, "%.2f", amount);
+        String currency = "LKR";
+        String statusCode = "2"; // Success
+        String paymentId = "PAYHERE_SIM_" + System.currentTimeMillis();
+
+        String secretMd5 = md5Hex(secret).toUpperCase();
+        String raw = merchantId + referenceNumber + formattedAmount + currency + statusCode + secretMd5;
+        String md5sig = md5Hex(raw).toUpperCase();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("merchant_id", merchantId);
+        params.put("order_id", referenceNumber);
+        params.put("payment_id", paymentId);
+        params.put("payhere_amount", formattedAmount);
+        params.put("payhere_currency", currency);
+        params.put("status_code", statusCode);
+        params.put("method", "VISA_SIMULATOR");
+        params.put("md5sig", md5sig);
+
+        handleNotification(params);
+
+        return params;
     }
 
     private String md5Hex(String input) {

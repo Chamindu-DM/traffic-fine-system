@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, CreditCard, CheckCircle, AlertCircle, MapPin } from 'lucide-react';
 import Logo from '../assets/Sri_Lanka_Police_logo.svg'
 
@@ -9,10 +9,41 @@ const PaymentPortal = () => {
   const [fine, setFine] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/fine-categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        } else {
+          useFallbackCategories();
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        useFallbackCategories();
+      }
+    };
+
+    const useFallbackCategories = () => {
+      setCategories([
+        { code: 'SPEEDING', name: 'Speeding' },
+        { code: 'SIGNAL', name: 'Traffic Signal Violation' },
+        { code: 'PARKING', name: 'Illegal Parking' },
+        { code: 'DRUNK_DRIVING', name: 'Drunk Driving' },
+        { code: 'NO_HELMET', name: 'No Helmet' },
+        { code: 'OVERLOADING', name: 'Overloading' }
+      ]);
+    };
+
+    fetchCategories();
+  }, []);
 
   const [paymentInfo, setPaymentInfo] = useState({
-    cardHolderName: '',
-    creditCardNumber: ''
+    firstName: '',
+    email: ''
   });
 
   const handleSearch = async (e) => {
@@ -50,27 +81,65 @@ const PaymentPortal = () => {
     setError('');
     setLoading(true);
     try {
-      const response = await fetch('/api/payments', {
+      const response = await fetch('/api/payments/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           referenceNumber: refNumber,
-          categoryCode: category,
-          cardHolderName: paymentInfo.cardHolderName,
-          creditCardNumber: paymentInfo.creditCardNumber
+          categoryCode: category
         })
       });
 
       if (response.ok) {
-        setStep(3);
+        const params = await response.json();
+
+        // Override default values with user inputs
+        params.first_name = paymentInfo.firstName.trim();
+        params.email = paymentInfo.email.trim();
+        params.last_name = "Name"; // required default
+
+        // Log the generated hash and payment payload right before startPayment
+        console.log("PayHere Payment Payload:", params);
+        console.log("PayHere Generated Hash:", params.hash);
+
+        // Configure PayHere JS SDK Callbacks
+        window.payhere.onCompleted = function (orderId) {
+          console.log("Payment completed. OrderID:", orderId);
+          setLoading(false);
+          // Redirect to payment success page
+          window.location.href = `/payment-success?order_id=${orderId}`;
+        };
+
+        window.payhere.onDismissed = function () {
+          console.log("Payment dismissed by user.");
+          setLoading(false);
+          setError("Payment cancelled: You closed the PayHere payment modal.");
+        };
+
+        window.payhere.onError = function (error) {
+          console.error("Payment error:", error);
+          setLoading(false);
+          setError(typeof error === 'string' ? error : JSON.stringify(error));
+        };
+
+        if (params.sandbox) {
+          window.payhere.sandbox = true;
+        }
+
+        window.payhere.startPayment(params);
       } else {
-        const err = await response.json();
-        setError(err.message || 'Payment failed. Please try again.');
+        const text = await response.text();
+        try {
+          const err = JSON.parse(text);
+          setError(err.message || 'Payment initiation failed. Please try again.');
+        } catch {
+          setError('Payment initiation failed. Please try again.');
+        }
       }
     } catch (err) {
       setError('Connection error. Please try again later.');
     } finally {
-      setLoading(false);
+      // Note: loading is set to false in SDK callbacks or on catch
     }
   };
 
@@ -91,7 +160,7 @@ const PaymentPortal = () => {
           </div>
         )}
 
-        {/* Step 1: Lookup[cite: 3] */}
+        {/* Step 1: Lookup */}
         {step === 1 && (
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
             <form onSubmit={handleSearch} className="space-y-5">
@@ -105,13 +174,20 @@ const PaymentPortal = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Category Code</label>
-                <input 
-                  type="text" required placeholder="e.g. SPEEDING"
-                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Fine Category</label>
+                <select
+                  required
+                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                />
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.code} value={cat.code}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button 
                 disabled={loading}
@@ -123,14 +199,14 @@ const PaymentPortal = () => {
           </div>
         )}
 
-        {/* Step 2: Payment[cite: 3] */}
+        {/* Step 2: Payment */}
         {step === 2 && fine && (
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
             <div className="pb-4 border-b">
               <h2 className="font-bold text-lg text-slate-800">Fine Details</h2>
               <div className="mt-2 space-y-1 text-sm text-gray-600">
                 <p>Ref: <span className="font-mono font-bold text-slate-900">{fine.referenceNumber}</span></p>
-                <p>Violation: {fine.categoryName}</p>
+                <p>Violation: {fine.category}</p>
                 <p className="flex items-center gap-1"><MapPin size={14}/> {fine.district}</p>
               </div>
               <div className="mt-4 p-3 bg-blue-50 rounded-lg flex justify-between items-center">
@@ -141,23 +217,29 @@ const PaymentPortal = () => {
 
             <form onSubmit={handlePayment} className="space-y-4">
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Payment Information</h3>
-              <input 
-                type="text" placeholder="Cardholder Name" 
-                className="w-full px-4 py-2.5 border rounded-xl outline-none" required 
-                value={paymentInfo.cardHolderName}
-                onChange={(e) => setPaymentInfo({...paymentInfo, cardHolderName: e.target.value})}
-              />
-              <input 
-                type="text" placeholder="Card Number" 
-                className="w-full px-4 py-2.5 border rounded-xl outline-none" required 
-                value={paymentInfo.creditCardNumber}
-                onChange={(e) => setPaymentInfo({...paymentInfo, creditCardNumber: e.target.value})}
-              />
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">First Name</label>
+                <input 
+                  type="text" placeholder="e.g. John" 
+                  className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required 
+                  value={paymentInfo.firstName}
+                  onChange={(e) => setPaymentInfo({...paymentInfo, firstName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                <input 
+                  type="email" placeholder="e.g. john@example.com" 
+                  className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required 
+                  value={paymentInfo.email}
+                  onChange={(e) => setPaymentInfo({...paymentInfo, email: e.target.value})}
+                />
+              </div>
               <button 
                 disabled={loading}
-                className="w-full bg-green-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-green-700 transition disabled:opacity-50"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50 shadow-sm"
               >
-                {loading ? 'Processing...' : <><CreditCard size={20}/> Pay Now</>}
+                {loading ? 'Processing...' : <><CreditCard size={20}/> Pay with PayHere</>}
               </button>
               <button 
                 type="button"
@@ -167,25 +249,6 @@ const PaymentPortal = () => {
                 Cancel and Search Again
               </button>
             </form>
-          </div>
-        )}
-
-        {/* Step 3: Success[cite: 3] */}
-        {step === 3 && (
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center animate-in zoom-in duration-300">
-            <div className="inline-flex p-4 bg-green-50 text-green-600 rounded-full mb-4">
-              <CheckCircle size={48} />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-800">Payment Successful!</h2>
-            <p className="text-gray-500 mt-2">
-              An SMS has been sent to the traffic officer. You may now retrieve your license[cite: 3].
-            </p>
-            <button 
-              onClick={() => setStep(1)}
-              className="mt-8 text-blue-600 font-semibold hover:underline"
-            >
-              Return Home
-            </button>
           </div>
         )}
       </div>

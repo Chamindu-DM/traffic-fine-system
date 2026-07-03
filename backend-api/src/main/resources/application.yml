@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: traffic-fine-backend-api
   datasource:
@@ -23,7 +25,7 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:traffic-fine-system-development-secret-key-change-me-please}
+    secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 
 springdoc:
