@@ -80,18 +80,24 @@ The system includes a fully refactored, event-driven microservices backend situa
 
 ### Running the Microservices
 
-1. **Install dependencies locally:**
+We provide full Docker Compose support to spin up the entire application and infrastructure stack automatically.
+
+1. **Run the full stack (Infrastructure + Microservices):**
    ```bash
    cd microservices
-   mvn clean install -DskipTests
+   docker-compose up --build -d
    ```
+   The gateway will be available at `http://localhost:8080`.
 
-2. **Ensure MySQL, Redis, and RabbitMQ are running natively on your machine.**
+2. **Run ONLY the infrastructure (for local development):**
+   If you want to run the Java applications natively in your IDE but need the databases and message brokers:
+   ```bash
+   cd microservices
+   docker-compose -f docker-compose.infra.yml up -d
+   ```
+   *Then you can run the services using Maven (`mvn spring-boot:run`).*
 
-3. **Start the services in order (in separate terminal tabs):**
-   * Registry: `cd service-registry && mvn spring-boot:run`
-   * Config Server: `cd config-server && mvn spring-boot:run`
-   * Other Services (e.g. gateway, auth-service): `cd <service-folder> && mvn spring-boot:run`
+> **Note:** The `init-databases.sql` script is automatically executed by the MySQL container on its first startup to create the 5 separate databases (`auth_db`, `fines_db`, `payments_db`, `notifications_db`, `reporting_db`).
 
 ## Default Admin Credentials (seed data)
 
