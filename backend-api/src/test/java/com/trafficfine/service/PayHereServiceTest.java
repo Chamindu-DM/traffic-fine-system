@@ -40,8 +40,8 @@ public class PayHereServiceTest {
         );
 
         // Inject configuration values using ReflectionTestUtils
-        ReflectionTestUtils.setField(payHereService, "merchantId", "M12345");
-        ReflectionTestUtils.setField(payHereService, "secret", "secretKey123");
+        ReflectionTestUtils.setField(payHereService, "merchantId", "test_merchant_id_123");
+        ReflectionTestUtils.setField(payHereService, "secret", "test_secret_abc");
         ReflectionTestUtils.setField(payHereService, "sandbox", true);
         ReflectionTestUtils.setField(payHereService, "notifyUrl", "http://localhost:8080/api/payments/notify");
         ReflectionTestUtils.setField(payHereService, "returnUrl", "http://localhost:5173/payment-success");
@@ -53,7 +53,7 @@ public class PayHereServiceTest {
         String hash = payHereService.generateHash("TF123456", new BigDecimal("5000.00"), "LKR");
         assertNotNull(hash);
         assertFalse(hash.isEmpty());
-        String expectedHash = calculateMd5Hex("M12345" + "TF123456" + "5000.00" + "LKR" + calculateMd5Hex("secretKey123").toUpperCase()).toUpperCase();
+        String expectedHash = calculateMd5Hex("test_merchant_id_123" + "TF123456" + "5000.00" + "LKR" + calculateMd5Hex("test_secret_abc").toUpperCase()).toUpperCase();
         assertEquals(expectedHash, hash);
     }
 
@@ -71,7 +71,7 @@ public class PayHereServiceTest {
 
         assertNotNull(request);
         assertEquals(true, request.get("sandbox"));
-        assertEquals("M12345", request.get("merchant_id"));
+        assertEquals("test_merchant_id_123", request.get("merchant_id"));
         assertEquals("http://localhost:5173/payment-success", request.get("return_url"));
         assertEquals("http://localhost:5173/payment-cancel", request.get("cancel_url"));
         assertEquals("http://localhost:8080/api/payments/notify", request.get("notify_url"));
@@ -129,7 +129,7 @@ public class PayHereServiceTest {
 
         // Let's create params for notify
         Map<String, String> params = new HashMap<>();
-        params.put("merchant_id", "M12345");
+        params.put("merchant_id", "test_merchant_id_123");
         params.put("order_id", "TF123456");
         params.put("payhere_amount", "5000.00");
         params.put("payhere_currency", "LKR");
@@ -138,7 +138,7 @@ public class PayHereServiceTest {
         params.put("method", "VISA");
 
         // generate signature
-        String raw = "M12345" + "TF123456" + "5000.00" + "LKR" + "2" + calculateMd5Hex("secretKey123").toUpperCase();
+        String raw = "test_merchant_id_123" + "TF123456" + "5000.00" + "LKR" + "2" + calculateMd5Hex("test_secret_abc").toUpperCase();
         String md5sig = calculateMd5Hex(raw).toUpperCase();
         params.put("md5sig", md5sig);
 
@@ -155,7 +155,7 @@ public class PayHereServiceTest {
     @Test
     void testHandleNotification_InvalidSig() {
         Map<String, String> params = new HashMap<>();
-        params.put("merchant_id", "M12345");
+        params.put("merchant_id", "test_merchant_id_123");
         params.put("order_id", "TF123456");
         params.put("payhere_amount", "5000.00");
         params.put("payhere_currency", "LKR");
@@ -177,14 +177,14 @@ public class PayHereServiceTest {
     void testHandleNotification_StatusCodeNot2() {
         // Let's create params for notify where status_code is not 2
         Map<String, String> params = new HashMap<>();
-        params.put("merchant_id", "M12345");
+        params.put("merchant_id", "test_merchant_id_123");
         params.put("order_id", "TF123456");
         params.put("payhere_amount", "5000.00");
         params.put("payhere_currency", "LKR");
         params.put("status_code", "0"); // e.g. pending
         params.put("payment_id", "P-100");
 
-        String raw = "M12345" + "TF123456" + "5000.00" + "LKR" + "0" + calculateMd5Hex("secretKey123").toUpperCase();
+        String raw = "test_merchant_id_123" + "TF123456" + "5000.00" + "LKR" + "0" + calculateMd5Hex("test_secret_abc").toUpperCase();
         String md5sig = calculateMd5Hex(raw).toUpperCase();
         params.put("md5sig", md5sig);
 
