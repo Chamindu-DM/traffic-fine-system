@@ -63,3 +63,6 @@ temp/
 backend-api/src/main/resources/application-local.properties
 *BACKEND_DOCUMENTATION.md
 *prompt.txt
+
+# Ignore all target directories inside microservices
+microservices/*/target/
