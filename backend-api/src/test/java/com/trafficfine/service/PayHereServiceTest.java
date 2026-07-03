@@ -53,14 +53,11 @@ public class PayHereServiceTest {
         String hash = payHereService.generateHash("TF123456", new BigDecimal("5000.00"), "LKR");
         assertNotNull(hash);
         assertFalse(hash.isEmpty());
-        // Since we know the MD5 of secretKey123 is:
-        // MD5("secretKey123") = "1814d6f90660408cd479d5a301e8dee9"
-        // Upper case secretMd5 = "1814D6F90660408CD479D5A301E8DEE9"
-        // Raw string to hash = "M12345" + "TF123456" + "5000.00" + "LKR" + "1814D6F90660408CD479D5A301E8DEE9"
-        // = "M12345TF1234565000.00LKR1814D6F90660408CD479D5A301E8DEE9"
-        // MD5 of raw string = "322d9c5b859cbef8cd9d71ba7935512f" (upper case = "322D9C5B859CBEF8CD9D71BA7935512F")
-        assertEquals("322D9C5B859CBEF8CD9D71BA7935512F", hash);
+        String expectedHash = calculateMd5Hex("M12345" + "TF123456" + "5000.00" + "LKR" + calculateMd5Hex("secretKey123").toUpperCase()).toUpperCase();
+        assertEquals(expectedHash, hash);
     }
+
+
 
     @Test
     void testCreatePaymentRequest_Success() {
@@ -141,11 +138,9 @@ public class PayHereServiceTest {
         params.put("method", "VISA");
 
         // generate signature
-        // raw signature = merchant_id + order_id + payhere_amount + payhere_currency + status_code + MD5(secret).toUpperCase()
-        // = "M12345" + "TF123456" + "5000.00" + "LKR" + "2" + "1814D6F90660408CD479D5A301E8DEE9"
-        // = "M12345TF1234565000.00LKR21814D6F90660408CD479D5A301E8DEE9"
-        // MD5 of raw string = "4c64a75e15fb504dff9cd098ff30e0e0" (upper case = "4C64A75E15FB504DFF9CD098FF30E0E0")
-        params.put("md5sig", "4C64A75E15FB504DFF9CD098FF30E0E0");
+        String raw = "M12345" + "TF123456" + "5000.00" + "LKR" + "2" + calculateMd5Hex("secretKey123").toUpperCase();
+        String md5sig = calculateMd5Hex(raw).toUpperCase();
+        params.put("md5sig", md5sig);
 
         payHereService.handleNotification(params);
 
@@ -189,9 +184,9 @@ public class PayHereServiceTest {
         params.put("status_code", "0"); // e.g. pending
         params.put("payment_id", "P-100");
 
-        // Raw: M12345TF1234565000.00LKR01814D6F90660408CD479D5A301E8DEE9
-        // MD5: 53e1f43e5b311045dec054ed2ceaae9b -> 53E1F43E5B311045DEC054ED2CEAAE9B
-        params.put("md5sig", "53E1F43E5B311045DEC054ED2CEAAE9B");
+        String raw = "M12345" + "TF123456" + "5000.00" + "LKR" + "0" + calculateMd5Hex("secretKey123").toUpperCase();
+        String md5sig = calculateMd5Hex(raw).toUpperCase();
+        params.put("md5sig", md5sig);
 
         payHereService.handleNotification(params);
 
@@ -199,5 +194,19 @@ public class PayHereServiceTest {
         verify(paymentRepository, never()).save(any(Payment.class));
         verify(trafficFineRepository, never()).save(any(TrafficFine.class));
         verify(smsService, never()).sendPaymentConfirmation(any(TrafficFine.class));
+    }
+
+    private String calculateMd5Hex(String input) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] hashInBytes = md.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashInBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
