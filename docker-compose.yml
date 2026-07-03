@@ -1,0 +1,23 @@
+include:
+  - microservices/docker-compose.yml
+
+services:
+  admin-web-portal:
+    build:
+      context: admin-web-portal
+      dockerfile: Dockerfile
+    container_name: admin-web-portal
+    ports:
+      - "5174:80"
+    depends_on:
+      - api-gateway
+
+  public-payment-web:
+    build:
+      context: public-payment-web
+      dockerfile: Dockerfile
+    container_name: public-payment-web
+    ports:
+      - "5173:80"
+    depends_on:
+      - api-gateway

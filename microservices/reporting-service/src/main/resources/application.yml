@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: reporting-service
+  config:
+    import: "optional:configserver:http://localhost:8888/"
   datasource:
     url: ${DB_URL:jdbc:h2:mem:reporting_db;DB_CLOSE_DELAY=-1}
     username: ${DB_USERNAME:sa}

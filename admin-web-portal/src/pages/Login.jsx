@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldAlert, Lock, User } from 'lucide-react';
+import Logo from '../assets/Sri_Lanka_Police_logo.svg'
 
 const Login = () => {
   const { login } = useAuth();
@@ -25,10 +26,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 font-sans">
       <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100">
-        <div className="flex flex-col items-center mb-8">
-          <div className="p-4 bg-blue-50 rounded-full text-blue-600 mb-3">
-            <ShieldAlert size={36} />
-          </div>
+        <div className="flex flex-col items-center mb-8 gap-2">
+          <img src={Logo} alt="Police Logo" width={100} height={100} />
           <h2 className="text-2xl font-bold text-slate-800">Sri Lanka Police</h2>
           <p className="text-sm text-gray-500 mt-1">Fine Monitoring Portal Login</p>
         </div>
