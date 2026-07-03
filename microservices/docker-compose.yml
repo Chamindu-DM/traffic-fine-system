@@ -60,8 +60,13 @@ services:
     ports:
       - "8888:8888"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker,native
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8888/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     depends_on:
       - service-registry
 
@@ -78,9 +83,12 @@ services:
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/
     depends_on:
-      - service-registry
-      - redis
-      - config-server
+      service-registry:
+        condition: service_started
+      redis:
+        condition: service_started
+      config-server:
+        condition: service_healthy
 
   auth-service:
     build:
@@ -105,7 +113,7 @@ services:
       service-registry:
         condition: service_started
       config-server:
-        condition: service_started
+        condition: service_healthy
 
   fine-service:
     build:
@@ -133,7 +141,7 @@ services:
       service-registry:
         condition: service_started
       config-server:
-        condition: service_started
+        condition: service_healthy
 
   payment-service:
     build:
@@ -161,7 +169,7 @@ services:
       service-registry:
         condition: service_started
       config-server:
-        condition: service_started
+        condition: service_healthy
 
   notification-service:
     build:
@@ -186,7 +194,7 @@ services:
       service-registry:
         condition: service_started
       config-server:
-        condition: service_started
+        condition: service_healthy
 
   reporting-service:
     build:
@@ -214,7 +222,7 @@ services:
       service-registry:
         condition: service_started
       config-server:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   mysql-data:
