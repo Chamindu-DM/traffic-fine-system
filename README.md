@@ -64,7 +64,7 @@ Runs on `http://localhost:5174`.
 
 Open `android-app/` in Android Studio and run on an emulator or physical device.
 
-## Microservices Architecture (Phase 2)
+## Microservices Architecture
 
 The system includes a fully refactored, event-driven microservices backend situated under the `microservices/` directory.
 
@@ -108,29 +108,12 @@ We provide full Docker Compose support to spin up the entire application and inf
 
 > **Note:** Change these before any real deployment.
 
-## Development Milestones
-
-| Milestone | Description |
-|---|---|
-| 1 | Repository & planning |
-| 2 | Backend foundation — entities, repositories, services, seed data |
-| 3 | Fine lookup & mock payment API |
-| 4 | JWT authentication & admin dashboard APIs |
-| 5 | Public payment web portal |
-| 6 | Admin web portal |
-| 7 | Android mobile app |
-| 8 | Testing, documentation & final submission |
-
 ## Key Design Decisions
 
 - **Mock payment gateway** — accepts test card details; always returns success for valid input.
 - **Mock SMS service** — logs SMS messages to the database and console; replaceable with Twilio / Notify.lk.
 - **JWT-based admin auth** — public fine lookup and payment endpoints are open; admin endpoints require a Bearer token.
 - **Duplicate payment prevention** — the backend rejects payment if the fine status is already `PAID`.
-
-## Contributing
-
-Each team member should work on a dedicated feature branch and open a pull request into `main`. Ensure your commits are meaningful and traceable to a milestone task.
 
 ## License
 
