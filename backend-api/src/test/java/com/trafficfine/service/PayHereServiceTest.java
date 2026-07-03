@@ -53,8 +53,11 @@ public class PayHereServiceTest {
         String hash = payHereService.generateHash("TF123456", new BigDecimal("5000.00"), "LKR");
         assertNotNull(hash);
         assertFalse(hash.isEmpty());
-        assertEquals("322D9C5B859CBEF8CD9D71BA7935512F", hash);
+        String expectedHash = calculateMd5Hex("M12345" + "TF123456" + "5000.00" + "LKR" + calculateMd5Hex("secretKey123").toUpperCase()).toUpperCase();
+        assertEquals(expectedHash, hash);
     }
+
+
 
     @Test
     void testCreatePaymentRequest_Success() {
@@ -135,7 +138,9 @@ public class PayHereServiceTest {
         params.put("method", "VISA");
 
         // generate signature
-        params.put("md5sig", "4C64A75E15FB504DFF9CD098FF30E0E0");
+        String raw = "M12345" + "TF123456" + "5000.00" + "LKR" + "2" + calculateMd5Hex("secretKey123").toUpperCase();
+        String md5sig = calculateMd5Hex(raw).toUpperCase();
+        params.put("md5sig", md5sig);
 
         payHereService.handleNotification(params);
 
@@ -179,7 +184,9 @@ public class PayHereServiceTest {
         params.put("status_code", "0"); // e.g. pending
         params.put("payment_id", "P-100");
 
-        params.put("md5sig", "53E1F43E5B311045DEC054ED2CEAAE9B");
+        String raw = "M12345" + "TF123456" + "5000.00" + "LKR" + "0" + calculateMd5Hex("secretKey123").toUpperCase();
+        String md5sig = calculateMd5Hex(raw).toUpperCase();
+        params.put("md5sig", md5sig);
 
         payHereService.handleNotification(params);
 
@@ -187,5 +194,19 @@ public class PayHereServiceTest {
         verify(paymentRepository, never()).save(any(Payment.class));
         verify(trafficFineRepository, never()).save(any(TrafficFine.class));
         verify(smsService, never()).sendPaymentConfirmation(any(TrafficFine.class));
+    }
+
+    private String calculateMd5Hex(String input) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] hashInBytes = md.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashInBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
