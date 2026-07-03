@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "app.jwt",
+      "type": "com.trafficfine.apigateway.filter.JwtAuthenticationFilter",
+      "sourceType": "com.trafficfine.apigateway.filter.JwtAuthenticationFilter"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}
