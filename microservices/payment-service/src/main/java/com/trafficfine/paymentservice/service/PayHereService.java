@@ -64,7 +64,12 @@ public class PayHereService {
     }
 
     public Map<String, Object> createPaymentRequest(String referenceNumber) {
-        FineLookupResponse fine = fineClient.getFine(referenceNumber);
+        FineLookupResponse fine;
+        try {
+            fine = fineClient.getFine(referenceNumber);
+        } catch (feign.FeignException.NotFound e) {
+            throw new ResourceNotFoundException("Fine not found");
+        }
 
         if ("PAID".equalsIgnoreCase(fine.status())) {
             throw new BusinessRuleException("This fine has already been paid");
@@ -115,7 +120,12 @@ public class PayHereService {
             String payhereAmount = params.get("payhere_amount");
             String method = params.getOrDefault("method", "PAYHERE");
 
-            FineLookupResponse fine = fineClient.getFine(orderId);
+            FineLookupResponse fine;
+            try {
+                fine = fineClient.getFine(orderId);
+            } catch (feign.FeignException.NotFound e) {
+                throw new ResourceNotFoundException("Fine not found");
+            }
 
             if ("PAID".equalsIgnoreCase(fine.status())) {
                 // Already processed, ignore

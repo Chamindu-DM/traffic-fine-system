@@ -27,6 +27,18 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
+        - id: admin-categories
+          uri: lb://fine-service
+          predicates:
+            - Path=/api/admin/categories
+          filters:
+            - RewritePath=/api/admin/categories, /api/fine-categories
+        - id: admin-officers
+          uri: lb://fine-service
+          predicates:
+            - Path=/api/admin/officers
+          filters:
+            - RewritePath=/api/admin/officers, /api/officers
         - id: fine-service
           uri: lb://fine-service
           predicates:

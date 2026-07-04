@@ -12,6 +12,7 @@ import com.trafficfine.paymentservice.entity.Payment;
 import com.trafficfine.paymentservice.entity.PaymentStatus;
 import com.trafficfine.paymentservice.integration.MockPaymentGateway;
 import com.trafficfine.paymentservice.repository.PaymentRepository;
+import com.trafficfine.common.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -59,7 +60,12 @@ public class PaymentService {
             }
         }
 
-        FineLookupResponse fine = fineClient.getFine(request.referenceNumber());
+        FineLookupResponse fine;
+        try {
+            fine = fineClient.getFine(request.referenceNumber());
+        } catch (feign.FeignException.NotFound e) {
+            throw new ResourceNotFoundException("Fine not found");
+        }
         if ("PAID".equalsIgnoreCase(fine.status())) {
             throw new BusinessRuleException("This fine has already been paid");
         }
