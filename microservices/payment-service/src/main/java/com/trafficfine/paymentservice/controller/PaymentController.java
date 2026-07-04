@@ -44,4 +44,9 @@ public class PaymentController {
     public void notify(@RequestParam Map<String, String> params) {
         payHereService.handleNotification(params);
     }
+
+    @PostMapping("/simulate-webhook")
+    public void simulateWebhook(@RequestParam("referenceNumber") String referenceNumber) {
+        payHereService.simulateWebhook(referenceNumber);
+    }
 }

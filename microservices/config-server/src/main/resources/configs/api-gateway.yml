@@ -90,9 +90,11 @@ app:
     public-paths:
       - /api/auth/login
       - /api/fines/lookup
+      - /api/fine-categories/**
       - /api/payments
       - /api/payments/initiate
       - /api/payments/notify
+      - /api/payments/simulate-webhook
       - /swagger-ui/**
       - /v3/api-docs/**
       - /actuator/**

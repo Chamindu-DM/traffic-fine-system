@@ -107,6 +107,35 @@ public class PayHereService {
         return request;
     }
 
+    public void simulateWebhook(String orderId) {
+        FineLookupResponse fine;
+        try {
+            fine = fineClient.getFine(orderId);
+        } catch (feign.FeignException.NotFound e) {
+            throw new ResourceNotFoundException("Fine not found");
+        }
+
+        String payhereAmount = String.format(Locale.US, "%.2f", fine.amount());
+        String payhereCurrency = "LKR";
+        String statusCode = "2";
+
+        String secretMd5 = md5Hex(secret).toUpperCase();
+        String raw = merchantId + orderId + payhereAmount + payhereCurrency + statusCode + secretMd5;
+        String md5sig = md5Hex(raw).toUpperCase();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("merchant_id", merchantId);
+        params.put("order_id", orderId);
+        params.put("payhere_amount", payhereAmount);
+        params.put("payhere_currency", payhereCurrency);
+        params.put("status_code", statusCode);
+        params.put("md5sig", md5sig);
+        params.put("payment_id", "SIM_" + System.currentTimeMillis());
+        params.put("method", "SIMULATOR");
+
+        handleNotification(params);
+    }
+
     @Transactional
     public void handleNotification(Map<String, String> params) {
         if (!verifyNotification(params)) {
