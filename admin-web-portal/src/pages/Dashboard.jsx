@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { LayoutDashboard, MapPin, AlertCircle, CheckCircle, Search, Filter } from 'lucide-react';
+import { MapPin, AlertCircle, CheckCircle, Search, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const COLORS = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981'];
@@ -86,7 +86,6 @@ const Dashboard = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen font-sans text-gray-800">
       <h1 className="text-3xl font-bold mb-8 flex items-center gap-3 text-slate-800">
-        <LayoutDashboard className="text-blue-600" size={32} /> 
         Traffic Fine Monitoring Dashboard
       </h1>
 
